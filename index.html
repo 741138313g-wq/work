@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="设计师 AI 应用生态市场调研：腾讯与 Adobe、Figma、Google、MasterGo、字节、Pencil 等横向对比。">
+  <meta name="theme-color" content="#f7f3e8">
+  <title>设计师 AI 应用生态市场调研</title>
+  <style>
+    :root {
+      --ink: #102a43;
+      --muted: #60758a;
+      --paper: #f7f3e8;
+      --card: rgba(255, 255, 255, 0.92);
+      --blue: #1268e8;
+      --cyan: #3ac8e8;
+      --lime: #d7ff45;
+      --orange: #ff7d3b;
+      --line: rgba(16, 42, 67, 0.16);
+      --shadow: 0 18px 55px rgba(17, 58, 99, 0.14);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 5%, rgba(58, 200, 232, 0.34), transparent 28rem),
+        radial-gradient(circle at 94% 22%, rgba(215, 255, 69, 0.25), transparent 24rem),
+        linear-gradient(150deg, #e8f2ff 0%, var(--paper) 48%, #eef8f5 100%);
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      min-height: 100vh;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.34;
+      background-image:
+        linear-gradient(rgba(16,42,67,.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(16,42,67,.045) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: linear-gradient(to bottom, black, transparent 80%);
+    }
+    a { color: var(--blue); }
+    .shell { width: min(1180px, calc(100% - 36px)); margin: 0 auto; position: relative; }
+
+    .topbar {
+      position: sticky; top: 0; z-index: 20;
+      border-bottom: 1px solid var(--line);
+      background: rgba(247, 243, 232, 0.78);
+      backdrop-filter: blur(18px);
+    }
+    .topbar .shell {
+      display: flex; align-items: center; justify-content: space-between;
+      min-height: 58px; gap: 18px; flex-wrap: wrap;
+    }
+    .brand {
+      font: 800 14px/1 "Trebuchet MS", sans-serif;
+      letter-spacing: .08em; text-transform: uppercase;
+    }
+    nav { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); }
+    nav a { text-decoration: none; color: inherit; }
+    nav a:hover { color: var(--blue); font-weight: 700; }
+
+    header.hero { padding: 76px 0 48px; }
+    .kicker {
+      display: flex; align-items: center; gap: 12px; color: var(--blue);
+      font: 800 13px/1 "Trebuchet MS", sans-serif; letter-spacing: .15em; text-transform: uppercase;
+    }
+    .kicker::before { content: ""; width: 42px; height: 4px; background: var(--orange); border-radius: 99px; }
+    h1, h2, h3 { margin: 0; }
+    h1 {
+      max-width: 920px; margin-top: 20px;
+      font-family: "Songti SC", "STSong", serif;
+      font-size: clamp(52px, 9vw, 104px);
+      font-weight: 900;
+      line-height: 1.3; letter-spacing: -.06em;
+    }
+    h1 em { font-style: normal; color: var(--blue); position: relative; white-space: nowrap; font-weight: 900; }
+    h1 em::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: 4px;
+      height: 14px; background: var(--lime); z-index: -1; transform: rotate(-1deg);
+    }
+    .lede { max-width: 760px; margin: 28px 0 0; color: var(--muted); font-size: 18px; line-height: 1.8; }
+    .hero-meta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+    .pill {
+      padding: 9px 14px; border: 1px solid var(--line); border-radius: 99px;
+      background: rgba(255,255,255,.58); font-size: 13px;
+    }
+    .pill.hot { border-color: transparent; background: var(--lime); font-weight: 800; }
+
+    section { padding: 44px 0; scroll-margin-top: 76px; }
+    .section-head { margin-bottom: 30px; }
+    .index {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 14px; color: var(--blue);
+      font: 900 13px/1 "Trebuchet MS", sans-serif; letter-spacing: .14em;
+    }
+    .index::after { content: ""; width: 46px; height: 2px; border-radius: 99px; background: var(--blue); opacity: .34; }
+    h2 {
+      font-family: "Songti SC", "STSong", serif;
+      font-size: clamp(calc(30px + 5pt), 3.6vw, calc(48px + 5pt));
+      font-weight: 900;
+      letter-spacing: -.04em;
+      line-height: 1.12;
+      text-wrap: balance;
+    }
+    .section-note { max-width: 760px; color: var(--muted); margin: 9px 0 0; line-height: 1.7; }
+
+    .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .stat-card {
+      padding: 22px; min-height: 168px;
+      border: 1px solid var(--line); border-radius: 20px;
+      background: var(--card); box-shadow: 0 8px 30px rgba(16,42,67,.07);
+      border-top: 5px solid var(--blue);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .stat-card:nth-child(2) { border-top-color: var(--cyan); }
+    .stat-card:nth-child(3) { border-top-color: var(--lime); }
+    .stat-card:nth-child(4) { border-top-color: var(--orange); }
+    .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+    .stat-card .label { font: 900 11px/1 "Trebuchet MS", sans-serif; letter-spacing: .1em; color: var(--blue); text-transform: uppercase; }
+    .stat-card .value { margin-top: 16px; font: 900 clamp(28px, 4vw, 38px)/1 "Trebuchet MS", sans-serif; color: var(--ink); }
+    .stat-card p { margin: 10px 0 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .stat-card .src { margin-top: 12px; font-size: 11px; color: var(--muted); }
+    .stat-card .src a { font-weight: 600; text-decoration: none; }
+    .stat-card .src a:hover { text-decoration: underline; }
+
+    .insight {
+      margin-top: 24px; padding: 22px 26px;
+      border-left: 4px solid var(--orange); border-radius: 0 20px 20px 0;
+      background: rgba(255,255,255,.72); line-height: 1.75; font-size: 15px;
+    }
+    .insight strong { color: var(--ink); }
+    .content-flow { display: flex; flex-direction: column; gap: 16px; }
+    .content-flow .insight { margin-top: 0; }
+    .content-flow .panel { margin-bottom: 0; }
+    .insight.critique { padding: 18px 22px; line-height: 1.65; font-size: 14px; }
+    .insight.critique ul { margin: 10px 0 0; padding-left: 18px; line-height: 1.65; }
+    .insight.critique li + li { margin-top: 8px; }
+    .insight.critique .critique-foot { display: block; margin-top: 10px; font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    .roadmap {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+      padding: 26px; border: 1px solid var(--line); border-radius: 26px;
+      background: #102a43; color: white; box-shadow: var(--shadow);
+    }
+    .step { position: relative; padding: 20px 17px; border-radius: 16px; background: rgba(255,255,255,.08); min-height: 150px; }
+    .step:not(:last-child)::after { content: "→"; position: absolute; right: -11px; top: 60px; z-index: 2; color: var(--lime); font-weight: 900; }
+    .step b { display: block; color: var(--lime); font: 900 12px/1 "Trebuchet MS", sans-serif; letter-spacing: .12em; }
+    .step h3 { margin-top: 18px; font-size: 19px; line-height: 1.3; }
+    .step p { margin: 9px 0 0; color: #bdd0df; font-size: 13px; line-height: 1.55; }
+    .step.active { outline: 2px solid var(--lime); outline-offset: -2px; }
+
+    .layers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; margin-top: 24px; }
+    .layer {
+      padding: 20px 14px; min-height: 140px; border-radius: 18px; background: white;
+      border-top: 5px solid var(--blue); box-shadow: 0 7px 22px rgba(16,42,67,.07);
+    }
+    .layer:nth-child(2) { border-color: var(--cyan); border-top-width: 5px; border-style: solid none none; }
+    .layer:nth-child(3) { border-color: var(--lime); border-top-width: 5px; border-style: solid none none; }
+    .layer:nth-child(4) { border-color: var(--orange); border-top-width: 5px; border-style: solid none none; }
+    .layer b { font-size: 16px; }
+    .layer p { margin: 10px 0 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+
+    .platform-map { display: grid; grid-template-columns: 1fr 50px 1fr 50px 1fr; align-items: stretch; gap: 0; }
+    .platform {
+      position: relative; padding: 26px; min-height: 220px;
+      border-radius: 24px; border: 1px solid var(--line); background: var(--card);
+    }
+    .platform small { color: var(--blue); font-weight: 900; letter-spacing: .12em; font-size: 11px; }
+    .platform h3 { margin-top: 22px; font: 700 26px/1.1 "Songti SC", serif; }
+    .platform p { color: var(--muted); line-height: 1.65; font-size: 14px; }
+    .platform ul { margin: 18px 0 0; padding-left: 18px; line-height: 1.8; font-size: 14px; }
+    .arrow { display: grid; place-items: center; color: var(--blue); font-size: 24px; font-weight: 900; }
+    .platform.primary { background: var(--blue); color: white; border-color: transparent; }
+    .platform.primary small, .platform.primary p, .platform.primary li { color: #d9e9ff; }
+
+    .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .card {
+      padding: 24px; border: 1px solid var(--line); border-radius: 20px;
+      background: var(--card); box-shadow: 0 8px 30px rgba(16,42,67,.07);
+      border-top: 5px solid var(--blue);
+    }
+    .card:nth-child(2) { border-top-color: var(--cyan); }
+    .card:nth-child(3) { border-top-color: var(--orange); }
+    .card h3 { font-family: "Songti SC", serif; font-size: 22px; font-weight: 800; margin-bottom: 10px; }
+    .card p, .card li { color: var(--muted); font-size: 14px; line-height: 1.65; }
+    .card ul { margin: 12px 0 0; padding-left: 18px; }
+
+    .panel {
+      padding: 26px; border: 1px solid var(--line); border-radius: 24px; background: var(--card);
+    }
+    .panel h3 { font-family: "Songti SC", serif; font-size: calc(27px + 5pt); font-weight: 900; margin-bottom: 12px; }
+
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 20px; background: var(--card); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 1120px; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; text-align: left; line-height: 1.5; }
+    th { padding: 11px 12px; background: #102a43; color: #fff; font-size: 12px; font-weight: 800; letter-spacing: .06em; }
+    tr:last-child td { border-bottom: 0; }
+    tr:hover td { background: #f3f7fb; }
+    .tag-yes { color: #0a6b3a; font-weight: 700; }
+    .tag-partial { color: #8a5100; font-weight: 700; }
+    .tag-no { color: var(--muted); }
+    .tag-weak { color: #7b3742; font-size: 12.5px; line-height: 1.55; }
+
+    .stage-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .stage-item {
+      padding: 14px 16px; border-radius: 14px; background: #f3f7fb;
+      border: 1px solid var(--line); font-size: 13px; line-height: 1.55; color: var(--muted);
+    }
+    .stage-item b { display: block; color: var(--blue); font-size: 13px; margin-bottom: 6px; }
+    .stage-item.active { background: rgba(215, 255, 69, 0.22); border-color: rgba(16, 42, 67, 0.22); }
+
+    .decision { margin-top: 18px; border: 1px solid var(--line); border-radius: 20px; overflow: hidden; background: var(--card); }
+    .decision-row { display: grid; grid-template-columns: 200px 1fr 1fr; }
+    .decision-row.cols4 { grid-template-columns: 132px 1fr 1fr 1fr; }
+    .decision-row > div { padding: 15px 18px; border-bottom: 1px solid var(--line); font-size: 14px; line-height: 1.55; }
+    .decision-row > div + div { border-left: 1px solid var(--line); }
+    .decision-row.head { background: #102a43; color: white; font-size: 12px; font-weight: 800; letter-spacing: .08em; }
+    .decision-row:last-child > div { border-bottom: 0; }
+
+    .glossary { display: grid; grid-template-columns: 140px 1fr; gap: 8px 16px; font-size: 14px; line-height: 1.6; margin-top: 16px; }
+    .glossary dt { color: var(--blue); font-weight: 800; }
+    .glossary dd { margin: 0; color: var(--muted); }
+
+    footer { padding: 40px 0 56px; color: var(--muted); }
+    footer .shell {
+      border-top: 1px solid var(--line);
+      padding-top: 28px;
+      font-size: 13px;
+    }
+    .footer-meta { margin-bottom: 24px; }
+    .footer-meta strong { display: block; font-size: 15px; color: var(--ink); margin-bottom: 6px; }
+    .footer-sources > strong {
+      display: block; margin-bottom: 12px; font-size: 12px; color: var(--blue);
+      font-family: "Trebuchet MS", sans-serif; letter-spacing: .08em; text-transform: uppercase;
+    }
+    .source-grid {
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px 24px; margin: 0; padding: 0; list-style: none; line-height: 1.5;
+    }
+    .source-grid a { font-weight: 600; text-decoration: none; color: var(--blue); }
+    .source-grid a:hover { text-decoration: underline; }
+    .source-list { margin: 12px 0 0; padding-left: 18px; line-height: 1.75; font-size: 13px; color: var(--muted); }
+    .source-list a { font-weight: 600; text-decoration: none; }
+    .source-list a:hover { text-decoration: underline; }
+
+    @media (max-width: 900px) {
+      .stat-grid, .three-col, .layers { grid-template-columns: repeat(2, 1fr); }
+      .stage-grid { grid-template-columns: 1fr; }
+      .source-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .roadmap { grid-template-columns: 1fr; }
+      .step:not(:last-child)::after { content: "↓"; right: auto; left: 50%; top: auto; bottom: -17px; }
+      .platform-map { grid-template-columns: 1fr; gap: 10px; }
+      .arrow { transform: rotate(90deg); min-height: 38px; }
+      .decision-row { grid-template-columns: 1fr; }
+      .decision-row > div + div { border-left: 0; }
+      .decision-row:not(.head) > div:first-child { color: var(--blue); font-weight: 800; background: #f3f7fb; }
+      .decision-row.head { display: none; }
+    }
+    @media (max-width: 620px) {
+      .shell { width: min(100% - 24px, 1180px); }
+      nav { display: none; }
+      header.hero { padding-top: 52px; }
+      h2 { font-size: clamp(26px, 6.8vw, 34px); line-height: 1.2; }
+      .stat-grid, .three-col, .layers { grid-template-columns: 1fr; }
+      .source-grid { grid-template-columns: 1fr; }
+    }
+    @media print {
+      .topbar { display: none; }
+      body { background: white; }
+      body::before { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="shell">
+      <div class="brand">Designer AI Ecosystem · 2026</div>
+      <nav>
+        <a href="#s1">全景</a>
+        <a href="#s2">范式</a>
+        <a href="#s3">腾讯</a>
+        <a href="#s4">诊断</a>
+        <a href="#s5">市场</a>
+        <a href="#s6">结论</a>
+      </nav>
+    </div>
+  </div>
+
+  <header class="hero">
+    <div class="shell">
+      <div class="kicker">Market Research · 2026</div>
+      <h1>设计师 <em>AI 应用生态</em><br>市场调研</h1>
+      <p class="lede">
+        本报告整理腾讯、Adobe、Figma、Google、MasterGo、字节、Pencil 等厂商在设计师 AI 工具上的公开进展，
+        从生图、可编辑设计稿、Agent 工作流、代码交付四个方面做横向对比。
+        总体判断：这类工具已经不只是生成图片，开始往可复用的设计流程和团队协作延伸，但大多还在早期阶段。
+      </p>
+      <div class="hero-meta">
+        <span class="pill hot">9 家平台横向对比</span>
+        <span class="pill">更新：2026-06-24</span>
+        <span class="pill">阅读约 12 分钟</span>
+      </div>
+    </div>
+  </header>
+
+  <section id="s1">
+    <div class="shell">
+      <div class="section-head">
+        <div class="index">01</div>
+        <h2>市场现在到了哪一步？</h2>
+        <p class="section-note">
+          这两年设计师 AI 工具的重点在变：早期主要是用 AI 生成图片，现在更多厂商把功能做成可复用、可管理的设计流程。
+          关注的问题也从「要不要用 AI 生图」，变成「怎么把设计经验整理成能反复用的方法」。
+        </p>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="label">腾讯 Buddy 产品线</div>
+          <div class="value">3+1</div>
+          <p>CodeBuddy（编程）、WordBuddy（办公）、LearnBuddy（教育/创作）+ Adot（专业设计执行端），各自负责不同方向。</p>
+          <div class="src">来源：<a href="https://cloud.tencent.com/developer/article/2691536" target="_blank" rel="noopener">腾讯云 LearnBuddy 概要</a> · <a href="https://cloud.tencent.com/product/adt" target="_blank" rel="noopener">Adot 产品页</a></div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Adot MCP 工具</div>
+          <div class="value">18</div>
+          <p>官方文档列出 18 个 MCP 工具，支持读取/修改设计稿、变量、组件库、批量编辑与导出等。</p>
+          <div class="src">来源：<a href="https://docs.ardot.tencent.com/en/ardot-mcp" target="_blank" rel="noopener">Adot MCP 文档</a></div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Agent Skills 标准</div>
+          <div class="value">OpenAI + Anthropic</div>
+          <p>两家均已发布官方 Skills 目录与规范（agentskills.io），Skill = 可复用上岗手册 + 可选资源包。</p>
+          <div class="src">来源：<a href="https://agentskills.io/specification" target="_blank" rel="noopener">Agent Skills 规范</a> · <a href="https://github.com/openai/skills" target="_blank" rel="noopener">OpenAI Skills</a></div>
+        </div>
+        <div class="stat-card">
+          <div class="label">字节新动作</div>
+          <div class="value">TRAE Design</div>
+          <p>TRAE Work 新增 Design 模式，主打「对话即设计、画布即原型」；和偏 C 端生图/视频的即梦走不同定位。</p>
+          <div class="src">来源：<a href="https://www.trae.cn/work" target="_blank" rel="noopener">TRAE Work 官网</a> · <a href="https://docs.trae.cn/solo_what-is-trae-solo" target="_blank" rel="noopener">官方文档</a></div>
+        </div>
+      </div>
+
+      <div class="insight">
+        <strong>成熟度三段标尺：</strong>
+        <strong>概念期</strong>（Prompt 试玩）→ <strong>工具期</strong>（单点文生图/生 UI）→
+        <strong>工作流/资产期</strong>（Skill + MCP + 专业设计执行端 + 设计系统治理）。
+        腾讯 Adot + LearnBuddy Skills 生态、Adobe Firefly AI Assistant、Figma Make、MasterGo MCP、
+        字节 TRAE Work Design 模式、Pencil（嵌入代码编辑器，如 Cursor）等，都在朝第三段走，
+        区别主要在各自绑定的设计系统有多深、Agent 编排能力强不强。
+        <span style="display:block;margin-top:8px;font-size:13px;color:var(--muted);">
+          需要说明的是，进入第三段不等于第三段已经成熟。多数功能仍在 beta/公测，离稳定可用还有距离，<a href="#s5">§05</a> 会具体说明各家的实际状态。
+        </span>
+      </div>
+
+      <div class="roadmap" style="margin-top:28px;">
+        <div class="step">
+          <b>阶段 1</b>
+          <h3>概念期</h3>
+          <p>聊天式 Prompt 试玩；输出多为不可编辑图片；无团队规范与复用。</p>
+        </div>
+        <div class="step">
+          <b>阶段 2</b>
+          <h3>工具期</h3>
+          <p>文生 UI、图生 UI、局部编辑；可编辑设计稿出现；仍偏单点任务。</p>
+        </div>
+        <div class="step active">
+          <b>阶段 3 · 当前入口</b>
+          <h3>工作流/资产期</h3>
+          <p>Skill 固化专家流程；MCP 读写设计稿；生成—精修—验证闭环；D2C 与代码交付。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="s2">
+    <div class="shell">
+      <div class="section-head">
+        <div class="index">02</div>
+        <h2>为什么这次和以前的生图工具不一样？</h2>
+        <p class="section-note">用几个类比说明 Agent 和 Skill 跟普通的生图功能有什么不同。</p>
+      </div>
+
+      <div class="three-col">
+        <div class="card">
+          <h3>认知造物</h3>
+          <p>唐纳德·诺曼有个观点：技术往往不是提升人的能力，而是<strong>改变任务本身</strong>。比如购物小票，把「回忆买了什么」变成「核对清单」。</p>
+          <p style="margin-top:10px;">设计工具也类似。对设计师来说，主要变化是工作内容：从过去从零搭界面，变成审核和修改 AI 生成的初稿。</p>
+        </div>
+        <div class="card">
+          <h3>外化链条</h3>
+          <ul>
+            <li>思想 → 语言 → 书写 → 印刷</li>
+            <li>→ 数字化 → 计算</li>
+            <li>→ <strong>Skill（外化专家经验）</strong></li>
+          </ul>
+          <p>Skill 把资深设计师的判断步骤写成可复用流程，替代每次重写的 Prompt。</p>
+        </div>
+        <div class="card">
+          <h3>类比框架</h3>
+          <ul>
+            <li><strong>LLM</strong> ≈ CPU（算力）</li>
+            <li><strong>Harness / Agent 平台</strong> ≈ OS（调度）</li>
+            <li><strong>Skill</strong> ≈ Application（专项工作流）</li>
+            <li><strong>MCP</strong> ≈ 驱动/接线口（读写设计稿）</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:24px;">
+        <h3>设计师语言对照表</h3>
+        <dl class="glossary">
+          <dt>Skill</dt><dd>可复用的「设计专家上岗手册」：规定何时触发、走哪些步骤、输出什么、何时停下。</dd>
+          <dt>MCP</dt><dd>让 AI 直接读写设计稿的「接线口」，能操作图层、变量、组件，而不只是导出 PNG。</dd>
+          <dt>Agent</dt><dd>接收目标、判断步骤、调用工具的执行主体；Skill 是被 Agent 按需加载的专项流程。</dd>
+          <dt>Design Token</dt><dd>颜色/字号/间距等设计变量；成熟工具（Adot、MasterGo）已支持 AI 读取与应用。</dd>
+          <dt>IDE</dt><dd>开发者写代码用的工具环境，类似设计师的 Figma 工作台；常见如 VS Code、Cursor。Pencil 把设计画布做进这类工具里，设计和代码同屏协作。</dd>
+          <dt>D2C</dt><dd>Design to Code，即设计稿转前端代码；Adot、MasterGo 均公开此能力。</dd>
+          <dt>.pen 文件</dt><dd>Pencil 的设计源文件，和代码放在同一个 Git 仓库管理；AI 经 MCP 直接读写，减少设计稿和代码不同步。</dd>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section id="s3">
+    <div class="shell">
+      <div class="section-head">
+        <div class="index">03</div>
+        <h2>腾讯这边：各产品分别管什么？</h2>
+        <p class="section-note">Buddy 系列 + Adot 设计端 + 桌面 Agent 三线（WorkBuddy / QClaw / Marvis），内容基于腾讯云、Adot 官方文档与公开产品说明整理。</p>
+      </div>
+
+      <div class="platform-map">
+        <div class="platform">
+          <small>运行 / 创作端</small>
+          <h3>LearnBuddy</h3>
+          <p>专家同行的 AI 自主学习平台；支持专家分身、Skills 生态、连接器、长期记忆。</p>
+          <ul>
+            <li>模块：任务 / 专家 / 技能 / 连接器 / 资料库</li>
+            <li>连接腾讯会议、文档、企业微信等</li>
+            <li>可积累 AI 课程与 Skills 资产</li>
+          </ul>
+        </div>
+        <div class="arrow">→</div>
+        <div class="platform primary">
+          <small>设计执行端</small>
+          <h3>Adot</h3>
+          <p>腾讯设计推出的 AI 驱动智能设计工具；面向专业设计师与企业设计系统。</p>
+          <ul>
+            <li>文生 UI / 图生 UI / H2D（HTML→设计稿）</li>
+            <li>内置 MCP Server（18 工具）</li>
+            <li>设计直转代码，对接 CodeBuddy</li>
+          </ul>
+        </div>
+        <div class="arrow">→</div>
+        <div class="platform">
+          <small>分发 / 标准</small>
+          <h3>SkillHub + Agent Skills</h3>
+          <p>Skill 包分发与版本管理；Adot 示例 Skill 采用 SKILL.md + references/scripts 结构。</p>
+          <ul>
+            <li>与通用 Agent Skills 规范对齐</li>
+            <li>Skill Creator 支持自然语言生成 Skill</li>
+            <li>Adot MCP 可回传 Agent 做二次优化</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="layers" style="margin-top:28px;">
+        <div class="layer"><b>CodeBuddy</b><p>编程垂类 Agent；Adot 设计稿经 MCP 一键还原 React/Vue/小程序代码。</p></div>
+        <div class="layer"><b>WordBuddy</b><p>办公垂类 Agent；与 LearnBuddy 同属 Buddy 家族，分工不同场景。</p></div>
+        <div class="layer"><b>LearnBuddy</b><p>教育/创作 Agent 平台；Skills + 连接器 + 专家分身，本地优先、数据私有化。</p></div>
+        <div class="layer"><b>Adot</b><p>专业设计画布 + AI 助手 + MCP；覆盖原型→视觉→协作→交付全链路。</p></div>
+      </div>
+
+      <div class="panel" style="margin-top:28px;">
+        <h3>桌面 Agent 三线：WorkBuddy · QClaw · Marvis</h3>
+        <p style="color:var(--muted);line-height:1.7;font-size:14px;margin:0 0 16px;">
+          2026 年腾讯在「本地电脑 + IM 远程调度」方向同期推出三款 Agent 产品（外界常称 OpenClaw「龙虾」系列）。
+          这三款<strong>出自不同团队、走不同路线</strong>，分别面向职场办公、个人微信操控、操作系统级执行，和 Adot 的专业设计画布不在一个层级。
+          （注：<strong>WorkBuddy</strong> 为桌面 Claw 产品，与 Buddy 家族中的 <strong>WordBuddy</strong> 办公垂类并非同一款。）
+        </p>
+        <div class="decision">
+          <div class="decision-row cols4 head"><div>维度</div><div>WorkBuddy</div><div>QClaw</div><div>Marvis（马维斯）</div></div>
+          <div class="decision-row cols4"><div>出品团队</div><div>腾讯云 / CodeBuddy 团队（在编程工具产品线上扩展 Claw 模式）</div><div>腾讯电脑管家团队</div><div>腾讯应用宝团队</div></div>
+          <div class="decision-row cols4"><div>技术路线</div><div>OpenClaw 底座 + 办公 Skills；打通 CodeBuddy 账号与计费</div><div>基于 OpenClaw 一键部署本地助手</div><div>自研「1 主 Agent + 5 专项 Agent」；公开称走操作系统级自研，而非 OpenClaw 封装</div></div>
+          <div class="decision-row cols4"><div>核心入口</div><div>企业微信、飞书、钉钉、QQ 等 IM 远程调度桌面</div><div>个人微信、QQ 远程对话操控电脑</div><div>Windows / Mac / 安卓桌面客户端为主，辅以手机跨端</div></div>
+          <div class="decision-row cols4"><div>主打场景</div><div>B 端办公自动化：日报、数据处理、知识库、企业级权限审计</div><div>C 端轻量操控：本地数据留本机，微信里发指令让电脑执行</div><div>系统级执行：文件整理、应用管理、系统设置、跨端「云监工」</div></div>
+          <div class="decision-row cols4"><div>与设计师工作流</div><div>偏协作与任务调度，可导入 Skills；不替代设计画布</div><div>偏远程触发电脑任务；不产出可编辑 UI 稿</div><div>偏本地素材/文档/系统操作；不绑定 Design System</div></div>
+        </div>
+        <p style="margin:14px 0 0;font-size:13px;color:var(--muted);line-height:1.65;">
+          <strong>怎么理解「三线并存」：</strong>腾讯 WorkBuddy 负责人在公开采访中称，多款产品定位不同、意在覆盖多样场景，而非简单重复。
+          对设计团队而言：Adot + MCP 仍是「设计稿生产与交付」的主线；WorkBuddy / QClaw / Marvis 更像电脑侧的通用 Agent 入口，可以在素材整理、办公协作等环节帮上忙，但替代不了专业设计工具。
+        </p>
+        <p style="margin:10px 0 0;font-size:12px;color:var(--muted);">
+          来源：<a href="https://cloud.tencent.com/act/solution-ai-application1-17582" target="_blank" rel="noopener">WorkBuddy 腾讯云产品页</a> ·
+          <a href="https://cloud.tencent.com/developer/article/2637063" target="_blank" rel="noopener">WorkBuddy / QClaw 开发者社区说明</a> ·
+          <a href="https://claw.guanjia.qq.com" target="_blank" rel="noopener">QClaw 官网</a> ·
+          <a href="https://marvis.qq.com/" target="_blank" rel="noopener">Marvis 官网</a> ·
+          <a href="https://news.qq.com/rain/a/20260314A06EUK00" target="_blank" rel="noopener">腾讯 WorkBuddy 负责人公开采访</a>
+        </p>
+      </div>
+
+      <div class="insight">
+        <strong>完整流程示意：</strong>在 LearnBuddy 里用自然语言创建、调试 Skill → 通过 MCP 连接器调用 Adot 生成可编辑设计稿 →
+        设计师在 Adot 里做像素级精修 → 回传 Agent 验证，或走 D2C 交付研发。
+        这是腾讯公开版本的「生成 → 精修 → 验证」流程。
+        <span style="display:block;margin-top:8px;font-size:13px;color:var(--muted);">
+          来源：<a href="https://docs.ardot.tencent.com/ai-features/" target="_blank" rel="noopener">Adot AI 功能概览</a> ·
+          <a href="https://cloud.tencent.com/product/adt" target="_blank" rel="noopener">Adot 腾讯云产品页</a>
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <section id="s4">
+    <div class="shell">
+      <div class="section-head">
+        <div class="index">04</div>
+        <h2>从设计师角度看：能做什么，还差什么</h2>
+        <p class="section-note">这里不排谁好谁坏，只对照各平台公开的能力，看它们覆盖了设计师工作流的哪些环节。</p>
+      </div>
+
+      <div class="three-col">
+        <div class="card">
+          <h3>能力已成形、可用</h3>
+          <ul>
+            <li><strong>可编辑设计稿：</strong>Adot、Figma First Draft、MasterGo AI 快搭、Pencil .pen 文件均产出可编辑图层</li>
+            <li><strong>设计系统对接：</strong>Adot 变量/组件库 MCP；MasterGo 调用企业 Design System；Pencil 支持 Design System / Style Guide</li>
+            <li><strong>代码交付：</strong>Adot D2C、MasterGo D2C Pro、Google Stitch、Pencil MCP 导出 HTML/React</li>
+            <li><strong>Agent 编排（多为公测/EA）：</strong>Adobe Firefly AI Assistant、字节 TRAE Work Design 模式已能演示「对话即设计」，但稳定性仍待验证</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>仍在快速演进</h3>
+          <ul>
+            <li><strong>Skill 生态：</strong>标准已确立，但设计类 Skill 数量与质量仍在早期</li>
+            <li><strong>MCP 云端版：</strong>Adot MCP 目前需桌面客户端；云端 MCP 仍在开发中</li>
+            <li><strong>新产品仍在早期：</strong>TRAE Work Design 模式、Pencil、Google Stitch 仍处 Early Access / Labs，稳定性与团队接入成本待验证</li>
+            <li><strong>跨工具一致性：</strong>生成稿与品牌规范、组件库的自动对齐仍依赖人工精修</li>
+            <li><strong>评测与治理：</strong>团队级 Skill 版本、权限、回归测试尚无行业通用方案</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>对专业设计师的意义</h3>
+          <ul>
+            <li>AI 负责快速出初稿，设计师负责判断和精修，角色更偏审核</li>
+            <li>和企业设计系统、MCP 打通的工具，比普通生图工具更难被替代</li>
+            <li>把经验整理成 Skill 比每次重写 Prompt 更有长期价值，不过目前还在早期</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:24px;">
+        <h3>Adot MCP vs Figma MCP（公开定位差异）</h3>
+        <p style="color:var(--muted);line-height:1.7;font-size:14px;margin:0 0 16px;">
+          以下表述来自腾讯设计官方文档与公开技术分享，供理解「原材料 vs 样品」两类 MCP 的设计取向差异。
+        </p>
+        <div class="decision">
+          <div class="decision-row head"><div>维度</div><div>Adot MCP（腾讯）</div><div>Figma MCP（行业参照）</div></div>
+          <div class="decision-row"><div>设计哲学</div><div>提供设计稿「原材料」，让 AI 当厨师组合出可用结果</div><div>更像提供「样品」，AI 需额外打磨才进研发流</div></div>
+          <div class="decision-row"><div>目标用户</div><div>专业设计师 + 企业设计系统场景</div><div>泛设计协作 + 已有 Figma 生态团队</div></div>
+          <div class="decision-row"><div>代码交付</div><div>直通 CodeBuddy，公开称高还原 D2C</div><div>Dev Mode + 第三方插件生态，路径因团队而异</div></div>
+          <div class="decision-row"><div>当前限制</div><div>MCP 需 macOS 桌面端；云端版开发中</div><div>依赖 Figma 账户与插件/MCP 配置</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="s5">
+    <div class="shell">
+      <div class="section-head">
+        <div class="index">05</div>
+        <h2>横向对比：不只是腾讯在做</h2>
+        <p class="section-note">把腾讯放到整个市场里，对照各厂商公开的能力和短板，都附来源链接。最右列「成熟度段」的定义见下框。</p>
+      </div>
+
+      <div class="content-flow">
+      <div class="panel">
+        <h3>成熟度段怎么读？</h3>
+        <p style="color:var(--muted);line-height:1.65;font-size:14px;margin:0 0 14px;">
+          与开篇「一页全景」中的<strong>三段标尺</strong>同一套归纳：按各平台在设计师工作流上的<strong>公开能力</strong>归类，非 Gartner 等第三方评级。
+        </p>
+        <div class="stage-grid">
+          <div class="stage-item">
+            <b>阶段 1 · 概念期</b>
+            聊天式 Prompt 试玩；输出多为不可编辑图片；无团队规范与复用。本表未列入此类纯生图工具。
+          </div>
+          <div class="stage-item">
+            <b>阶段 2 · 工具期</b>
+            文生 UI / 图生 UI / 局部编辑；可编辑设计稿出现；仍偏单点任务，Agent / Skill / MCP 未成型或较弱。
+          </div>
+          <div class="stage-item active">
+            <b>阶段 3 · 工作流/资产期</b>
+            Skill 固化专家流程；MCP 读写设计稿；生成—精修—验证闭环；D2C 与代码交付；可对接设计系统。
+          </div>
+        </div>
+        <p style="margin:12px 0 0;font-size:13px;color:var(--muted);line-height:1.6;">
+          <strong>阶段 2→3</strong>：已经具备工具期的核心能力（可编辑稿 / 生 UI），但 Agent 编排、Skill 生态或 MCP 链路还在 beta、Early Access 或补齐中。表里 Figma、Stitch、TRAE Work、Pencil 等多属此类。
+        </p>
+      </div>
+
+      <div class="insight critique" style="border-left-color: var(--orange);">
+        <strong>需要冷静看待：阶段 3 目前更多是「能力到位」，还不是「生产可用」。</strong>
+        把各家的宣传口径和它们自己公布的产品状态放在一起看，差距比较明显：
+        <ul>
+          <li><strong>宣传说「正式可用」，实际多在测试阶段。</strong>Adot 仍在公测，Firefly AI Assistant 公测，Figma Agent 还是 beta，Google Stitch 属于 Labs 实验项目，TRAE Work Design 和 Pencil 都还在 Early Access。真正稳定、能直接投入生产的并不多；MasterGo、即梦已经商用，但覆盖的能力范围比较窄。</li>
+          <li><strong>演示里的完整流程，换个环境未必跑得通。</strong>比如 Adot MCP 目前只支持 macOS 桌面端，云端版还没上线。换一套系统或企业流程，从生成到交付的链路就容易断；能跑通演示，不代表团队能日常使用。</li>
+          <li><strong>「把经验沉淀成 Skill 资产」还停留在设想阶段。</strong>Skill 的标准已经有了，但设计类的 Skill 数量少、质量参差；团队怎么管理 Skill 的版本、权限和测试，行业里也还没有成熟做法。</li>
+          <li><strong>真正的工作量还在设计师身上。</strong>AI 生成的稿子要对齐品牌规范和组件库，基本还得人工调整。AI 主要省的是起稿的时间，把关和修改这部分省不掉。</li>
+        </ul>
+        <span class="critique-foot">
+          所以表里标的「阶段 3」或「2→3」，指的是这些产品已经走在这个方向上，不代表已经做到位。对团队来说，现在适合投入精力了解方法、积累能力，但不建议只凭厂商宣传就大规模投入预算或改造现有流程。
+        </span>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>平台</th>
+              <th>公开定位</th>
+              <th>核心 AI 能力（公开）</th>
+              <th>可编辑设计稿</th>
+              <th>Agent / Skill / MCP</th>
+              <th>代码交付</th>
+              <th>局限 / 短板（公开）</th>
+              <th>成熟度段*</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>腾讯 Adot</strong></td>
+              <td>专业 AI 设计协作平台</td>
+              <td>文/图生 UI、H2D、AI 助手批量改图层</td>
+              <td class="tag-yes">是</td>
+              <td class="tag-yes">MCP 18 工具 + Skills</td>
+              <td class="tag-yes">D2C → CodeBuddy</td>
+              <td class="tag-weak">MCP 仅 macOS 桌面端、云端版开发中；新用户 1000 Credits 用完需自备模型；仍处公测</td>
+              <td>阶段 3</td>
+            </tr>
+            <tr>
+              <td><strong>腾讯 LearnBuddy</strong></td>
+              <td>教育/创作 Agent 平台</td>
+              <td>专家分身、Skills 生态、连接器、AI 制课</td>
+              <td class="tag-partial">经 Adot 联动</td>
+              <td class="tag-yes">Skills + MCP 连接器</td>
+              <td class="tag-partial">偏创作/科研流程</td>
+              <td class="tag-weak">面向教育/科研场景，非商业设计交付；需机构接入；设计能力依赖 Adot 联动</td>
+              <td>阶段 3</td>
+            </tr>
+            <tr>
+              <td><strong>Adobe Firefly</strong></td>
+              <td>一体化创意 AI 工作室</td>
+              <td>Firefly AI Assistant 跨 PS/AI/PR 编排；30+ 模型</td>
+              <td class="tag-yes">Creative Cloud 内编辑</td>
+              <td class="tag-yes">Creative Agent + Skills</td>
+              <td class="tag-partial">生态内交付</td>
+              <td class="tag-weak">AI Assistant 仍公测；需 Creative Cloud/Firefly 付费计划；偏 Adobe 生态封闭</td>
+              <td>阶段 3</td>
+            </tr>
+            <tr>
+              <td><strong>Figma</strong></td>
+              <td>协作设计 + AI 套件</td>
+              <td>First Draft 线框/初稿；Make 交互原型与 Web App</td>
+              <td class="tag-yes">原生 Figma 图层</td>
+              <td class="tag-partial">Agent beta（2026）</td>
+              <td class="tag-partial">Make + Supabase</td>
+              <td class="tag-weak">Agent 仍 beta、分批 rollout；AI 额度受 seat 限制；早期 Make Designs 曾因相似度问题下线重做</td>
+              <td>阶段 2→3</td>
+            </tr>
+            <tr>
+              <td><strong>Google Stitch</strong><br><small>（原 Galileo AI）</small></td>
+              <td>AI-native 设计画布（Labs）</td>
+              <td>文/图生 UI、DESIGN.md、多屏原型、Attention 热图</td>
+              <td class="tag-yes">可编辑 + 导出 Figma</td>
+              <td class="tag-yes">Stitch MCP + Design Agent</td>
+              <td class="tag-yes">HTML/CSS/React</td>
+              <td class="tag-weak">Google Labs 实验性产品、形态仍在变动；有生成额度限制；非生产级稳定保证</td>
+              <td>阶段 2→3</td>
+            </tr>
+            <tr>
+              <td><strong>MasterGo AI</strong></td>
+              <td>国产 Figma 替代 + 企业 DS</td>
+              <td>AI 快搭、设计助手、D2C Pro、变量/组件</td>
+              <td class="tag-yes">MasterGo 画布</td>
+              <td class="tag-yes">MCP Server（2025.03）</td>
+              <td class="tag-yes">React 等生产级代码</td>
+              <td class="tag-weak">AI 已商业化、积分制收费；能力偏 UI/界面场景；生态与模型规模小于头部厂商</td>
+              <td>阶段 3</td>
+            </tr>
+            <tr>
+              <td><strong>字节 即梦 AI</strong></td>
+              <td>多模态创作平台（C 端为主）</td>
+              <td>Seedream 4.0 文生图/编辑/组图；文生视频</td>
+              <td class="tag-partial">图像级，非 UI 组件</td>
+              <td class="tag-no">未公开 MCP/Skill</td>
+              <td class="tag-no">非设计交付导向</td>
+              <td class="tag-weak">产出为图像/视频非可编辑 UI；无设计系统/交付链路；曾因 AI 标识合规被主管部门约谈</td>
+              <td>阶段 2</td>
+            </tr>
+            <tr>
+              <td><strong>字节 TRAE Work</strong><br><small>Design 模式</small></td>
+              <td>AI 原生工作台（Work / Code 双模式）</td>
+              <td>Design 模式：对话即设计、画布即原型；自然语言生成 PRD、可交互原型与网页</td>
+              <td class="tag-partial">画布原型，偏 HTML/页面级</td>
+              <td class="tag-yes">Skills 生态 + MCP</td>
+              <td class="tag-partial">HTML 页面 / 原型代码</td>
+              <td class="tag-weak">Design 模式仍较新；非专业设计画布（无 Figma 级组件系统）；Work 模式本质仍靠 Agent 生成代码完成任务</td>
+              <td>阶段 2→3</td>
+            </tr>
+            <tr>
+              <td><strong>Pencil</strong><br><small>（pencil.dev）</small></td>
+              <td>嵌入代码编辑器（如 Cursor）的 AI 设计画布 + Git 设计文件</td>
+              <td>无限画布、.pen 文件入仓库；Prompt 块生成 UI；Design System / Style Guide</td>
+              <td class="tag-yes">.pen 可编辑 + Git 版本管理</td>
+              <td class="tag-yes">MCP（batch_design / batch_get 等）</td>
+              <td class="tag-yes">React / HTML / CSS（经 Claude Code 等）</td>
+              <td class="tag-weak">Early Access 阶段；深度绑定 Claude Code/Cursor 体验；Mac 端更 polished、Windows 较弱；需自备 AI API 额度</td>
+              <td>阶段 2→3</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin:0;font-size:12px;color:var(--muted);">*成熟度段 = 上框三段标尺；「2→3」= 过渡态。归纳依据为各厂商官网与官方文档，非市场份额或优劣排名。</p>
+      </div>
+
+      <div class="panel" style="margin-top:24px;">
+        <h3>行业共识：Agent Skills 已成标准方向</h3>
+        <p style="color:var(--muted);line-height:1.7;font-size:14px;">
+          OpenAI、Anthropic 均已发布官方 Skills 目录与创建规范；SkillHub 提供版本化 ZIP 分发与安全报告。
+          设计类 Skill 的价值不只是改文字或生图，更多在于<strong>把判断流程固定下来</strong>，
+          例如约定行业判断的优先级、复用组件做变体校验等（参考 Adot 官方 Skill 示例）。
+          这是多家厂商共同在做的方向，不是某一家的单独尝试。
+        </p>
+        <ul class="source-list">
+          <li><a href="https://agentskills.io/specification" target="_blank" rel="noopener">Agent Skills 规范</a></li>
+          <li><a href="https://github.com/anthropics/skills" target="_blank" rel="noopener">Anthropic Skills</a></li>
+          <li><a href="https://ardot.tencent.com/skills" target="_blank" rel="noopener">Adot Skills 示例页</a></li>
+          <li><a href="https://skillhub.cn/" target="_blank" rel="noopener">SkillHub</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="s6">
+    <div class="shell">
+      <div class="section-head">
+        <div class="index">06</div>
+        <h2>对设计团队意味着什么</h2>
+        <p class="section-note">分三层给设计团队的建议。</p>
+      </div>
+
+      <div class="decision">
+        <div class="decision-row head"><div>判断层级</div><div>建议</div><div>理由（公开事实）</div></div>
+        <div class="decision-row">
+          <div>值得现在关注</div>
+          <div>可编辑设计稿 + MCP + 设计系统（先小范围验证）</div>
+          <div>Adot、MasterGo、Figma、Adobe 均已公开此组合；专业设计师场景与企业 DS 绑定最深。但多为 beta/公测，建议先小范围试点跑通再扩大。</div>
+        </div>
+        <div class="decision-row">
+          <div>可观望但需跟踪</div>
+          <div>Skill 生态、Agent 编排与新形态工具</div>
+          <div>Firefly AI Assistant、Figma Agent 仍 beta；TRAE Work Design 模式与 Pencil 仍 Early Access；设计类 Skill 质量参差。</div>
+        </div>
+        <div class="decision-row">
+          <div>建议先储备方法</div>
+          <div>把团队经验写成 Skill 雏形</div>
+          <div>第三段真正值钱的是「可复用的工作流」，不是一条条 Prompt 模板；就算之后不换工具，这套方法也用得上。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="shell">
+      <div class="footer-meta">
+        <strong>设计师 AI 应用生态市场调研</strong>
+        <span>2026-06-24</span>
+      </div>
+      <div class="footer-sources">
+        <strong>主要来源</strong>
+        <ul class="source-grid">
+          <li><a href="https://cloud.tencent.com/product/adt" target="_blank" rel="noopener">腾讯 Adot 产品页</a></li>
+          <li><a href="https://docs.ardot.tencent.com/" target="_blank" rel="noopener">Adot 官方文档</a></li>
+          <li><a href="https://cloud.tencent.com/developer/article/2691536" target="_blank" rel="noopener">腾讯云 LearnBuddy 概要</a></li>
+          <li><a href="https://www.adobe.com/products/firefly.html" target="_blank" rel="noopener">Adobe Firefly</a></li>
+          <li><a href="https://www.figma.com/make/" target="_blank" rel="noopener">Figma Make</a></li>
+          <li><a href="https://blog.google/innovation-and-ai/models-and-research/google-labs/stitch-ai-ui-design/" target="_blank" rel="noopener">Google Stitch</a></li>
+          <li><a href="https://mastergo.com/blog/109" target="_blank" rel="noopener">MasterGo AI</a></li>
+          <li><a href="https://apps.apple.com/cn/app/id6503676563" target="_blank" rel="noopener">即梦 AI App Store</a></li>
+          <li><a href="https://www.trae.cn/work" target="_blank" rel="noopener">TRAE Work 官网</a></li>
+          <li><a href="https://docs.trae.cn/solo_what-is-trae-solo" target="_blank" rel="noopener">TRAE Work 官方文档</a></li>
+          <li><a href="https://cloud.tencent.com/act/solution-ai-application1-17582" target="_blank" rel="noopener">WorkBuddy 产品页</a></li>
+          <li><a href="https://claw.guanjia.qq.com" target="_blank" rel="noopener">QClaw 官网</a></li>
+          <li><a href="https://marvis.qq.com/" target="_blank" rel="noopener">Marvis 官网</a></li>
+          <li><a href="https://docs.pencil.dev/getting-started/ai-integration" target="_blank" rel="noopener">Pencil MCP 文档</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
